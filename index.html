@@ -1,0 +1,1388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GenlorAI — Free Media Tools</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://js.puter.com/v2/"></script>
+<style>
+  :root {
+    --purple: #6B4FFF;
+    --purple-light: #8B72FF;
+    --purple-bg: #F0EDFF;
+    --dark: #0D0D14;
+    --gray: #6B7280;
+    --light: #F8F7FF;
+    --white: #FFFFFF;
+    --border: #E5E3F0;
+    --green: #10B981;
+    --shadow: 0 4px 24px rgba(107,79,255,0.12);
+    --shadow-lg: 0 12px 48px rgba(107,79,255,0.18);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--light);
+    color: var(--dark);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ===== NAVBAR ===== */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.85);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px;
+  }
+
+  .nav-logo {
+    display: flex; align-items: center; gap: 10px;
+    cursor: pointer; text-decoration: none;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px; border-radius: 10px;
+    background: linear-gradient(135deg, #6B4FFF, #9B59B6);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .logo-text {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: 1.1rem;
+    color: var(--dark);
+  }
+
+  .nav-links { display: flex; gap: 4px; }
+
+  .nav-link {
+    padding: 8px 16px; border-radius: 8px;
+    font-size: 0.9rem; font-weight: 500;
+    color: var(--gray); cursor: pointer;
+    border: none; background: transparent;
+    display: flex; align-items: center; gap: 6px;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .nav-link:hover { background: var(--purple-bg); color: var(--purple); }
+  .nav-link.active { background: var(--purple-bg); color: var(--purple); font-weight: 600; }
+
+  /* ===== PAGES ===== */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* ===== HOME PAGE ===== */
+  .hero {
+    min-height: calc(100vh - 64px);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem 2rem;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(107,79,255,0.08) 0%, transparent 70%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='30' cy='30' r='1' fill='%236B4FFF' opacity='0.08'/%3E%3C/svg%3E") repeat;
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 16px; border-radius: 100px;
+    background: var(--white); border: 1px solid var(--border);
+    font-size: 0.82rem; font-weight: 500; color: var(--purple);
+    margin-bottom: 1.5rem;
+    box-shadow: var(--shadow);
+    animation: fadeUp 0.6s ease;
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 800; line-height: 1.1;
+    margin-bottom: 1.25rem;
+    animation: fadeUp 0.6s ease 0.1s both;
+  }
+
+  .hero h1 span { color: var(--purple); }
+
+  .hero p {
+    font-size: 1.1rem; color: var(--gray);
+    max-width: 560px; line-height: 1.7;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.6s ease 0.2s both;
+  }
+
+  .hero-btns {
+    display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+    animation: fadeUp 0.6s ease 0.3s both;
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px; border-radius: 12px;
+    font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; border: none;
+    transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+    text-decoration: none;
+  }
+
+  .btn-primary {
+    background: var(--dark); color: var(--white);
+    box-shadow: 0 4px 16px rgba(13,13,20,0.25);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(13,13,20,0.3); }
+
+  .btn-purple {
+    background: var(--purple); color: var(--white);
+    box-shadow: 0 4px 16px rgba(107,79,255,0.35);
+  }
+  .btn-purple:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(107,79,255,0.45); }
+
+  .btn-outline {
+    background: var(--white); color: var(--dark);
+    border: 1.5px solid var(--border);
+  }
+  .btn-outline:hover { border-color: var(--purple); color: var(--purple); transform: translateY(-2px); }
+
+  /* Tools Section */
+  .section {
+    padding: 5rem 2rem;
+    max-width: 1200px; margin: 0 auto;
+  }
+
+  .section-title {
+    text-align: center; margin-bottom: 3rem;
+  }
+
+  .section-title h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem; font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+
+  .section-title p { color: var(--gray); }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .tool-card {
+    background: var(--white); border-radius: 20px;
+    padding: 2rem; border: 1px solid var(--border);
+    transition: all 0.3s; cursor: pointer;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  }
+
+  .tool-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--purple);
+  }
+
+  .tool-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: 1.25rem;
+  }
+
+  .tool-icon.blue { background: #EEF2FF; }
+  .tool-icon.purple { background: #F3F0FF; }
+  .tool-icon.green { background: #ECFDF5; }
+
+  .tool-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;
+  }
+
+  .tool-card p { color: var(--gray); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1.25rem; }
+
+  .tool-link {
+    color: var(--purple); font-weight: 600; font-size: 0.9rem;
+    display: flex; align-items: center; gap: 4px;
+    cursor: pointer;
+  }
+
+  /* Features */
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 2rem;
+  }
+
+  .feature-item { text-align: center; padding: 1.5rem; }
+
+  .feature-icon-wrap {
+    width: 64px; height: 64px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 28px; margin: 0 auto 1rem;
+  }
+
+  .feature-icon-wrap.yellow { background: #FFF9E6; }
+  .feature-icon-wrap.teal { background: #ECFDF5; }
+  .feature-icon-wrap.blue { background: #EFF6FF; }
+
+  .feature-item h3 {
+    font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 0.5rem;
+  }
+
+  .feature-item p { color: var(--gray); font-size: 0.9rem; line-height: 1.6; }
+
+  /* ===== INNER PAGE LAYOUT ===== */
+  .page-header {
+    text-align: center; padding: 3rem 2rem 1rem;
+    background: radial-gradient(ellipse 60% 80% at 50% 0%, rgba(107,79,255,0.07) 0%, transparent 70%);
+  }
+
+  .breadcrumb {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; font-size: 0.85rem; color: var(--gray);
+    margin-bottom: 1rem;
+  }
+
+  .breadcrumb span { color: var(--dark); font-weight: 500; }
+  .breadcrumb .sep { color: var(--border); }
+
+  .page-header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 800; margin-bottom: 0.75rem;
+  }
+
+  .page-header p { color: var(--gray); font-size: 1rem; max-width: 500px; margin: 0 auto; }
+
+  /* Ad placeholder */
+  .ad-banner {
+    max-width: 740px; margin: 1.5rem auto;
+    height: 90px; border: 1.5px dashed #D0CCEA;
+    border-radius: 10px; display: flex;
+    align-items: center; justify-content: center;
+    color: #B0ABCC; font-size: 0.78rem; letter-spacing: 0.1em;
+    background: rgba(255,255,255,0.5);
+  }
+
+  .ad-sidebar {
+    width: 160px; height: 600px;
+    border: 1.5px dashed #D0CCEA; border-radius: 10px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    color: #B0ABCC; font-size: 0.75rem; letter-spacing: 0.08em;
+    background: rgba(255,255,255,0.5); flex-shrink: 0;
+    gap: 4px;
+  }
+
+  .page-layout {
+    display: flex; gap: 1.5rem;
+    max-width: 1280px; margin: 0 auto;
+    padding: 1.5rem 2rem;
+    align-items: flex-start;
+  }
+
+  .main-content { flex: 1; min-width: 0; }
+
+  /* ===== TOOL CARD WRAPPER ===== */
+  .tool-box {
+    background: var(--white); border-radius: 20px;
+    border: 1px solid var(--border); padding: 2rem;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+  }
+
+  /* ===== CONVERTER ===== */
+  .dropzone {
+    border: 2px dashed var(--border); border-radius: 16px;
+    padding: 3rem 2rem; text-align: center;
+    cursor: pointer; transition: all 0.2s;
+    position: relative;
+  }
+
+  .dropzone:hover, .dropzone.dragover {
+    border-color: var(--purple);
+    background: var(--purple-bg);
+  }
+
+  .dropzone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    width: 100%; height: 100%;
+  }
+
+  .dropzone-icon {
+    width: 56px; height: 56px; border-radius: 14px;
+    background: var(--white); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin: 0 auto 1rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .dropzone h3 { font-family: 'Syne', sans-serif; font-weight: 600; margin-bottom: 0.25rem; }
+  .dropzone h3 a { color: var(--purple); text-decoration: underline; }
+  .dropzone p { color: var(--gray); font-size: 0.85rem; }
+
+  .format-label {
+    display: block; font-weight: 600; margin-bottom: 1rem; margin-top: 1.5rem;
+  }
+
+  .format-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+
+  .format-btn {
+    padding: 12px; border-radius: 12px;
+    border: 1.5px solid var(--border);
+    background: var(--white); cursor: pointer;
+    text-align: center; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+
+  .format-btn .fmt { font-weight: 700; font-size: 1rem; color: var(--dark); }
+  .format-btn .desc { font-size: 0.75rem; color: var(--gray); margin-top: 2px; }
+
+  .format-btn:hover { border-color: var(--purple); background: var(--purple-bg); }
+  .format-btn.selected { border-color: var(--purple); background: var(--purple-bg); }
+  .format-btn.selected .fmt { color: var(--purple); }
+
+  /* Files list */
+  .files-list { margin-top: 1.5rem; display: flex; flex-direction: column; gap: 8px; }
+
+  .file-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 10px;
+    border: 1px solid var(--border); background: var(--white);
+  }
+
+  .file-thumb {
+    width: 40px; height: 40px; border-radius: 8px;
+    object-fit: cover; border: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .file-info { flex: 1; min-width: 0; }
+  .file-info .fname { font-size: 0.85rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .file-info .fsize { font-size: 0.78rem; color: var(--gray); }
+
+  .file-status {
+    font-size: 0.78rem; font-weight: 600; padding: 3px 10px;
+    border-radius: 100px;
+  }
+  .file-status.ready { background: #FFF9E6; color: #B45309; }
+  .file-status.done { background: #ECFDF5; color: var(--green); }
+  .file-status.error { background: #FEF2F2; color: #EF4444; }
+
+  .btn-convert {
+    width: 100%; margin-top: 1.5rem;
+    padding: 15px; border-radius: 12px;
+    background: var(--purple); color: var(--white);
+    border: none; font-size: 1rem; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+    transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+
+  .btn-convert:hover { background: var(--purple-light); transform: translateY(-2px); box-shadow: var(--shadow); }
+  .btn-convert:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ===== AI GENERATOR ===== */
+  .prompt-area {
+    width: 100%; min-height: 120px;
+    border: 1.5px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; font-size: 0.95rem;
+    resize: vertical; outline: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s;
+    color: var(--dark); background: var(--white);
+  }
+  .prompt-area:focus { border-color: var(--purple); }
+
+  .prompt-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1rem; }
+  .chip {
+    padding: 6px 14px; border-radius: 100px;
+    border: 1px solid var(--border);
+    font-size: 0.82rem; color: var(--gray);
+    cursor: pointer; transition: all 0.15s;
+    background: var(--white);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .chip:hover { border-color: var(--purple); color: var(--purple); background: var(--purple-bg); }
+
+  .ratio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 1rem; }
+
+  .ratio-btn {
+    padding: 16px 10px; border-radius: 12px;
+    border: 1.5px solid var(--border); background: var(--white);
+    cursor: pointer; text-align: center; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .ratio-btn .ratio-icon { font-size: 1.5rem; margin-bottom: 6px; }
+  .ratio-btn .ratio-name { font-weight: 600; font-size: 0.9rem; }
+  .ratio-btn .ratio-dim { font-size: 0.75rem; color: var(--gray); }
+  .ratio-btn:hover, .ratio-btn.selected { border-color: var(--purple); background: var(--purple-bg); }
+  .ratio-btn.selected .ratio-name { color: var(--purple); }
+
+  .gen-result { margin-top: 1.5rem; display: none; }
+  .gen-result.show { display: block; }
+
+  .gen-img-wrap {
+    border-radius: 16px; overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--light);
+    position: relative; min-height: 200px;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .gen-img-wrap img { width: 100%; display: block; border-radius: 16px; }
+
+  .gen-loading {
+    display: flex; flex-direction: column;
+    align-items: center; gap: 12px; padding: 3rem;
+    color: var(--gray);
+  }
+
+  .spinner {
+    width: 40px; height: 40px; border-radius: 50%;
+    border: 3px solid var(--border);
+    border-top-color: var(--purple);
+    animation: spin 0.8s linear infinite;
+  }
+
+  .btn-download {
+    width: 100%; margin-top: 1rem;
+    padding: 13px; border-radius: 12px;
+    background: var(--dark); color: var(--white);
+    border: none; font-size: 0.95rem; font-weight: 600;
+    cursor: pointer; display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+    transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  }
+  .btn-download:hover { opacity: 0.85; transform: translateY(-1px); }
+
+  /* ===== IMAGE TO PDF ===== */
+  .pdf-dropzone {
+    border: 2px dashed var(--border); border-radius: 16px;
+    padding: 3rem 2rem; text-align: center;
+    cursor: pointer; transition: all 0.2s;
+    position: relative;
+  }
+  .pdf-dropzone:hover, .pdf-dropzone.dragover {
+    border-color: var(--purple); background: var(--purple-bg);
+  }
+  .pdf-dropzone input[type=file] {
+    position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+  }
+
+  .pdf-images-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px; margin-top: 1.5rem;
+  }
+
+  .pdf-img-item {
+    border-radius: 12px; border: 1px solid var(--border);
+    overflow: hidden; position: relative; background: var(--light);
+    aspect-ratio: 1;
+  }
+
+  .pdf-img-item img { width: 100%; height: 100%; object-fit: cover; }
+
+  .pdf-img-remove {
+    position: absolute; top: 6px; right: 6px;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: rgba(0,0,0,0.6); color: white;
+    border: none; cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.2s;
+  }
+
+  .pdf-img-num {
+    position: absolute; bottom: 6px; left: 6px;
+    background: rgba(107,79,255,0.85); color: white;
+    font-size: 0.72rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 100px;
+  }
+
+  /* How It Works */
+  .how-works {
+    margin-top: 3rem; padding: 2rem;
+    background: var(--white); border-radius: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .how-works h2 {
+    font-family: 'Syne', sans-serif; font-size: 1.4rem;
+    font-weight: 700; text-align: center; margin-bottom: 2rem;
+  }
+
+  .steps-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem; text-align: center;
+  }
+
+  .step-num {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--purple-bg);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    color: var(--purple); font-size: 1.1rem;
+    margin: 0 auto 0.75rem;
+  }
+
+  .step-item h4 { font-weight: 700; margin-bottom: 0.25rem; }
+  .step-item p { color: var(--gray); font-size: 0.85rem; }
+
+  /* Footer */
+  footer {
+    text-align: center; padding: 2rem;
+    color: var(--gray); font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  .model-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px; margin-bottom: 0.5rem;
+  }
+
+  .model-btn {
+    padding: 12px 14px; border-radius: 12px;
+    border: 1.5px solid var(--border); background: var(--white);
+    cursor: pointer; text-align: left; transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .model-btn .model-name { font-weight: 700; font-size: 0.88rem; color: var(--dark); margin-bottom: 2px; }
+  .model-btn .model-desc { font-size: 0.75rem; color: var(--gray); }
+  .model-btn:hover { border-color: var(--purple); background: var(--purple-bg); }
+  .model-btn.selected { border-color: var(--purple); background: var(--purple-bg); }
+  .model-btn.selected .model-name { color: var(--purple); }
+
+
+  .toast {
+    position: fixed; bottom: 24px; right: 24px;
+    background: var(--dark); color: var(--white);
+    padding: 12px 20px; border-radius: 12px;
+    font-size: 0.9rem; font-weight: 500;
+    transform: translateY(100px); opacity: 0;
+    transition: all 0.3s; z-index: 999;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-left: 4px solid var(--green); }
+  .toast.error { border-left: 4px solid #EF4444; }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .ad-sidebar { display: none; }
+  }
+  @media (max-width: 640px) {
+    .steps-grid { grid-template-columns: 1fr; }
+    .nav-links { gap: 2px; }
+    .nav-link { padding: 6px 10px; font-size: 0.82rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav>
+  <a class="nav-logo" onclick="showPage('home')">
+    <div class="logo-icon">✦</div>
+    <span class="logo-text">GenlorAI</span>
+  </a>
+  <div class="nav-links">
+    <button class="nav-link" id="nav-converter" onclick="showPage('converter')">📄 Converter</button>
+    <button class="nav-link" id="nav-generator" onclick="showPage('generator')">✨ AI Generator</button>
+    <button class="nav-link" id="nav-pdf" onclick="showPage('pdf')">📑 Image to PDF</button>
+  </div>
+</nav>
+
+<!-- ===================== HOME PAGE ===================== -->
+<div class="page active" id="page-home">
+  <div class="hero">
+    <div class="hero-badge">⚡ Free Online Tools — No Sign Up Required</div>
+    <h1>Convert &amp; Create<br><span>Powerful Media Tools</span></h1>
+    <p>Convert images between formats instantly and generate stunning AI images — all free, unlimited, and right in your browser.</p>
+    <div class="hero-btns">
+      <button class="btn btn-primary" onclick="showPage('converter')">📄 Convert Images →</button>
+      <button class="btn btn-purple" onclick="showPage('generator')">✨ Generate AI Images →</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">
+      <h2>All-in-One Media Toolkit</h2>
+      <p>Powerful tools, completely free.</p>
+    </div>
+    <div class="tools-grid">
+      <div class="tool-card" onclick="showPage('converter')">
+        <div class="tool-icon blue">📄</div>
+        <h3>Image Converter</h3>
+        <p>Convert JPG, PNG, WEBP, GIF, BMP — drop your files and download instantly. Batch convert multiple files at once.</p>
+        <div class="tool-link">Use Tool →</div>
+      </div>
+      <div class="tool-card" onclick="showPage('generator')">
+        <div class="tool-icon purple">✨</div>
+        <h3>AI Image Generator</h3>
+        <p>Create stunning images from text prompts. Choose square, portrait, or landscape. Free and unlimited.</p>
+        <div class="tool-link">Use Tool →</div>
+      </div>
+      <div class="tool-card" onclick="showPage('pdf')">
+        <div class="tool-icon green">📑</div>
+        <h3>Image to PDF</h3>
+        <p>Convert multiple images into a single PDF file. Perfect for documents and portfolios.</p>
+        <div class="tool-link">Use Tool →</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="background: var(--white); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="section">
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="feature-icon-wrap yellow">⚡</div>
+          <h3>Lightning Fast</h3>
+          <p>All conversions happen in your browser. No upload wait times.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon-wrap teal">🛡️</div>
+          <h3>Completely Free</h3>
+          <p>No hidden costs, no limits. Use as much as you need.</p>
+        </div>
+        <div class="feature-item">
+          <div class="feature-icon-wrap blue">🌐</div>
+          <h3>Works Everywhere</h3>
+          <p>Desktop, tablet, or phone — perfect results every time.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>© 2026 GenlorAI Tools. Free online image converter and AI image generator.</footer>
+</div>
+
+<!-- ===================== CONVERTER PAGE ===================== -->
+<div class="page" id="page-converter">
+  <div class="page-header">
+    <div class="breadcrumb">🏠 Home <span class="sep">›</span> <span>Image Converter</span></div>
+    <h1>Image Converter</h1>
+    <p>Convert your images to JPG, PNG, WEBP, GIF, BMP or ICO — free and instant.</p>
+  </div>
+
+  <div class="ad-banner">ADVERTISEMENT · 728×90</div>
+
+  <div class="page-layout">
+    <div class="ad-sidebar">AD<br>160×600</div>
+
+    <div class="main-content">
+      <div class="tool-box">
+        <div class="dropzone" id="conv-drop">
+          <input type="file" id="conv-input" multiple accept="image/*">
+          <div class="dropzone-icon">⬆️</div>
+          <h3>Drop your files here or <a>browse</a></h3>
+          <p>Supports JPG, PNG, WEBP, GIF, BMP, TIFF, SVG</p>
+        </div>
+
+        <label class="format-label">Convert to:</label>
+        <div class="format-grid" id="format-grid">
+          <button class="format-btn selected" data-fmt="jpg" onclick="selectFormat(this)">
+            <div class="fmt">.JPG</div><div class="desc">Best for photos</div>
+          </button>
+          <button class="format-btn" data-fmt="png" onclick="selectFormat(this)">
+            <div class="fmt">.PNG</div><div class="desc">Lossless quality</div>
+          </button>
+          <button class="format-btn" data-fmt="webp" onclick="selectFormat(this)">
+            <div class="fmt">.WEBP</div><div class="desc">Modern & small</div>
+          </button>
+          <button class="format-btn" data-fmt="gif" onclick="selectFormat(this)">
+            <div class="fmt">.GIF</div><div class="desc">For animations</div>
+          </button>
+          <button class="format-btn" data-fmt="bmp" onclick="selectFormat(this)">
+            <div class="fmt">.BMP</div><div class="desc">Uncompressed</div>
+          </button>
+          <button class="format-btn" data-fmt="ico" onclick="selectFormat(this)">
+            <div class="fmt">.ICO</div><div class="desc">For favicons</div>
+          </button>
+        </div>
+
+        <div class="files-list" id="conv-files-list"></div>
+
+        <button class="btn-convert" id="btn-convert" onclick="convertAll()" disabled>
+          ✦ Convert All Files
+        </button>
+      </div>
+
+      <div class="how-works">
+        <h2>How It Works</h2>
+        <div class="steps-grid">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <h4>Upload Files</h4>
+            <p>Drag &amp; drop or browse for your images.</p>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <h4>Choose Format</h4>
+            <p>Select your desired output format.</p>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <h4>Download</h4>
+            <p>Get your converted files instantly.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ad-sidebar">AD<br>160×600</div>
+  </div>
+</div>
+
+<!-- ===================== AI GENERATOR PAGE ===================== -->
+<div class="page" id="page-generator">
+  <div class="page-header">
+    <div class="breadcrumb">🏠 Home <span class="sep">›</span> <span>AI Image Generator</span></div>
+    <h1>AI Image Generator</h1>
+    <p>Create stunning images from text descriptions. Free, unlimited, and instant.</p>
+  </div>
+
+  <div class="ad-banner">ADVERTISEMENT · 728×90</div>
+
+  <div class="page-layout">
+    <div class="ad-sidebar">AD<br>160×600</div>
+
+    <div class="main-content">
+      <div class="tool-box">
+        <label class="format-label" style="margin-top:0">Describe your image</label>
+        <textarea class="prompt-area" id="gen-prompt" placeholder="A serene mountain lake at sunset, photorealistic, ultra detailed..."></textarea>
+
+        <div class="prompt-chips">
+          <div class="chip" onclick="setPrompt('A cyberpunk cityscape at night, neon lights, rain reflections, ultra detailed')">Cyberpunk city at night</div>
+          <div class="chip" onclick="setPrompt('Watercolor painting of a magical forest with glowing mushrooms')">Magical forest</div>
+          <div class="chip" onclick="setPrompt('Cute cat wearing sunglasses on a beach, cartoon style')">Cute cat on beach</div>
+          <div class="chip" onclick="setPrompt('Abstract geometric patterns, vibrant colors, 4K')">Abstract geometric</div>
+          <div class="chip" onclick="setPrompt('Futuristic sports car concept, studio lighting, photorealistic')">Futuristic car</div>
+          <div class="chip" onclick="setPrompt('Peaceful zen garden with cherry blossoms, golden hour, cinematic')">Zen garden</div>
+        </div>
+
+        <!-- Model Selector -->
+        <label class="format-label">AI Model</label>
+        <div class="model-grid" id="model-grid">
+          <button class="model-btn selected" data-model="flux" onclick="selectModel(this)">
+            <div class="model-name">⚡ FLUX Schnell</div>
+            <div class="model-desc">Fastest · High quality</div>
+          </button>
+          <button class="model-btn" data-model="flux-dev" onclick="selectModel(this)">
+            <div class="model-name">🎨 FLUX Dev</div>
+            <div class="model-desc">Detailed · Artistic</div>
+          </button>
+          <button class="model-btn" data-model="dalle3" onclick="selectModel(this)">
+            <div class="model-name">🤖 DALL-E 3</div>
+            <div class="model-desc">OpenAI · Creative</div>
+          </button>
+          <button class="model-btn" data-model="sdxl" onclick="selectModel(this)">
+            <div class="model-name">🌟 SDXL</div>
+            <div class="model-desc">Stable Diffusion XL</div>
+          </button>
+        </div>
+
+        <label class="format-label">Aspect Ratio</label>
+        <div class="ratio-grid">
+          <button class="ratio-btn selected" data-ratio="square" onclick="selectRatio(this)">
+            <div class="ratio-icon">⬜</div>
+            <div class="ratio-name">Square</div>
+            <div class="ratio-dim">1:1 · 1024×1024</div>
+          </button>
+          <button class="ratio-btn" data-ratio="portrait" onclick="selectRatio(this)">
+            <div class="ratio-icon">📱</div>
+            <div class="ratio-name">Portrait</div>
+            <div class="ratio-dim">3:4 · 768×1024</div>
+          </button>
+          <button class="ratio-btn" data-ratio="landscape" onclick="selectRatio(this)">
+            <div class="ratio-icon">🖥️</div>
+            <div class="ratio-name">Landscape</div>
+            <div class="ratio-dim">4:3 · 1024×768</div>
+          </button>
+        </div>
+
+        <button class="btn-convert" id="btn-generate" onclick="generateImage()" style="margin-top:1.5rem">
+          ✨ Generate Image
+        </button>
+
+        <div class="gen-result" id="gen-result">
+          <div class="gen-img-wrap" id="gen-img-wrap">
+            <div class="gen-loading" id="gen-loading">
+              <div class="spinner"></div>
+              <p id="gen-status-text">Creating your masterpiece... this may take 15-30s</p>
+            </div>
+          </div>
+          <button class="btn-download" id="btn-dl-gen" style="display:none" onclick="downloadGenImage()">
+            ⬇️ Download Image
+          </button>
+        </div>
+      </div>
+
+      <!-- Puter.js info note -->
+      <div style="margin-top:1rem;padding:12px 16px;background:var(--purple-bg);border-radius:12px;border:1px solid #D6CFFF;font-size:0.83rem;color:var(--purple)">
+        ✦ <strong>Powered by Puter.js</strong> — Free AI image generation using FLUX, DALL-E 3 &amp; Stable Diffusion. On first use, a quick Puter sign-in may appear (free, takes 10 seconds).
+      </div>
+
+      <div class="how-works">
+        <h2>How It Works</h2>
+        <div class="steps-grid">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <h4>Describe</h4>
+            <p>Type a detailed description of the image you want.</p>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <h4>Choose Model & Size</h4>
+            <p>Select AI model and aspect ratio.</p>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <h4>Download</h4>
+            <p>Get your AI-generated image instantly.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ad-sidebar">AD<br>160×600</div>
+  </div>
+</div>
+
+<!-- ===================== IMAGE TO PDF PAGE ===================== -->
+<div class="page" id="page-pdf">
+  <div class="page-header">
+    <div class="breadcrumb">🏠 Home <span class="sep">›</span> <span>Image to PDF</span></div>
+    <h1>Image to PDF Converter</h1>
+    <p>Convert your images to a single PDF file — free and unlimited</p>
+  </div>
+
+  <div class="ad-banner">ADVERTISEMENT · 728×90</div>
+
+  <div class="page-layout">
+    <div class="ad-sidebar">AD<br>160×600</div>
+
+    <div class="main-content">
+      <div class="tool-box">
+        <div class="pdf-dropzone" id="pdf-drop">
+          <input type="file" id="pdf-input" multiple accept="image/*">
+          <div class="dropzone-icon">⬆️</div>
+          <h3 style="font-family:'Syne',sans-serif;font-weight:600;margin-bottom:0.25rem">Click to upload images</h3>
+          <p style="color:var(--gray);font-size:0.85rem">Select multiple images to add them to your PDF</p>
+        </div>
+
+        <div class="pdf-images-grid" id="pdf-images-grid"></div>
+
+        <button class="btn-convert" id="btn-pdf" onclick="generatePDF()" disabled style="background:var(--green)">
+          📑 Generate PDF
+        </button>
+      </div>
+
+      <div class="how-works" style="background:#F0FDF4; border-color:#A7F3D0;">
+        <h2>How It Works</h2>
+        <div class="steps-grid">
+          <div class="step-item">
+            <div class="step-num" style="background:#DCFCE7;color:var(--green)">1</div>
+            <h4>Upload Images</h4>
+            <p>Select one or multiple images from your device</p>
+          </div>
+          <div class="step-item">
+            <div class="step-num" style="background:#DCFCE7;color:var(--green)">2</div>
+            <h4>Arrange Order</h4>
+            <p>Images will appear in the order you select them</p>
+          </div>
+          <div class="step-item">
+            <div class="step-num" style="background:#DCFCE7;color:var(--green)">3</div>
+            <h4>Download PDF</h4>
+            <p>Get your combined PDF file instantly</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ad-sidebar">AD<br>160×600</div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== ROUTING =====
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const navEl = document.getElementById('nav-' + name);
+  if (navEl) navEl.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ===== TOAST =====
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ===================== CONVERTER =====================
+let convFiles = [];
+let selectedFormat = 'jpg';
+
+document.getElementById('conv-input').addEventListener('change', (e) => {
+  addConvFiles(Array.from(e.target.files));
+});
+
+const convDrop = document.getElementById('conv-drop');
+convDrop.addEventListener('dragover', e => { e.preventDefault(); convDrop.classList.add('dragover'); });
+convDrop.addEventListener('dragleave', () => convDrop.classList.remove('dragover'));
+convDrop.addEventListener('drop', e => {
+  e.preventDefault(); convDrop.classList.remove('dragover');
+  addConvFiles(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+});
+
+function addConvFiles(files) {
+  files.forEach(f => {
+    convFiles.push({ file: f, status: 'ready' });
+  });
+  renderConvFiles();
+  document.getElementById('btn-convert').disabled = convFiles.length === 0;
+}
+
+function renderConvFiles() {
+  const list = document.getElementById('conv-files-list');
+  list.innerHTML = '';
+  convFiles.forEach((item, i) => {
+    const url = URL.createObjectURL(item.file);
+    const div = document.createElement('div');
+    div.className = 'file-item';
+    div.innerHTML = `
+      <img class="file-thumb" src="${url}">
+      <div class="file-info">
+        <div class="fname">${item.file.name}</div>
+        <div class="fsize">${(item.file.size/1024).toFixed(1)} KB</div>
+      </div>
+      <span class="file-status ${item.status}">${item.status === 'ready' ? 'Ready' : item.status === 'done' ? '✓ Done' : '✗ Error'}</span>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function selectFormat(btn) {
+  document.querySelectorAll('.format-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedFormat = btn.dataset.fmt;
+}
+
+async function convertAll() {
+  if (!convFiles.length) return;
+  const btn = document.getElementById('btn-convert');
+  btn.disabled = true; btn.textContent = '⏳ Converting...';
+
+  for (let i = 0; i < convFiles.length; i++) {
+    try {
+      await convertFile(convFiles[i], i);
+    } catch(e) {
+      convFiles[i].status = 'error';
+    }
+  }
+
+  renderConvFiles();
+  btn.disabled = false; btn.innerHTML = '✦ Convert All Files';
+  showToast(`✓ Converted ${convFiles.length} file(s) to .${selectedFormat.toUpperCase()}`);
+}
+
+function convertFile(item, idx) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(item.file);
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      if (selectedFormat === 'jpg' || selectedFormat === 'bmp') {
+        ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      }
+      ctx.drawImage(img, 0, 0);
+
+      let mimeType = 'image/' + selectedFormat;
+      if (selectedFormat === 'jpg') mimeType = 'image/jpeg';
+      if (selectedFormat === 'ico') mimeType = 'image/png'; // fallback
+
+      canvas.toBlob(blob => {
+        if (!blob) { reject(); return; }
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        const baseName = item.file.name.replace(/\.[^/.]+$/, '');
+        a.download = `${baseName}.${selectedFormat}`;
+        a.click();
+        item.status = 'done';
+        renderConvFiles();
+        URL.revokeObjectURL(url);
+        resolve();
+      }, mimeType, 0.92);
+    };
+    img.onerror = reject;
+    img.src = url;
+  });
+}
+
+// ===================== AI GENERATOR =====================
+let selectedModel = 'flux';
+let selectedRatio = 'square';
+let lastGenUrl = null;
+let statusTimer = null;
+
+function selectModel(btn) {
+  document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedModel = btn.dataset.model;
+}
+
+function selectRatio(btn) {
+  document.querySelectorAll('.ratio-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedRatio = btn.dataset.ratio;
+}
+
+function setPrompt(text) {
+  document.getElementById('gen-prompt').value = text;
+}
+
+function getRatioDimensions() {
+  if (selectedRatio === 'portrait')  return { w: 768,  h: 1024 };
+  if (selectedRatio === 'landscape') return { w: 1280, h: 720  };
+  return { w: 1024, h: 1024 };
+}
+
+function setStatus(msg) {
+  const el = document.getElementById('gen-status-text');
+  if (el) el.textContent = msg;
+}
+
+function startStatusCycle(messages) {
+  if (statusTimer) clearInterval(statusTimer);
+  let i = 0;
+  setStatus(messages[0]);
+  statusTimer = setInterval(() => { i = (i + 1) % messages.length; setStatus(messages[i]); }, 4000);
+}
+
+function stopStatusCycle() {
+  if (statusTimer) { clearInterval(statusTimer); statusTimer = null; }
+}
+
+function resetLoading() {
+  const ld = document.getElementById('gen-loading');
+  ld.innerHTML = `<div class="spinner"></div><p id="gen-status-text">✨ Starting generation...</p>`;
+  ld.style.display = 'flex';
+  // Clear previous image
+  const prev = document.getElementById('gen-result-img');
+  if (prev) prev.remove();
+  document.getElementById('btn-dl-gen').style.display = 'none';
+  document.getElementById('gen-result').classList.add('show');
+}
+
+function showSuccess(imgUrl) {
+  stopStatusCycle();
+  lastGenUrl = imgUrl;
+  document.getElementById('gen-loading').style.display = 'none';
+
+  const wrap = document.getElementById('gen-img-wrap');
+  const img = document.createElement('img');
+  img.id = 'gen-result-img';
+  img.src = imgUrl;
+  img.alt = 'AI Generated Image';
+  img.style.cssText = 'width:100%;border-radius:16px;display:block;';
+
+  // If image fails to display (shouldn't happen since we verified it loaded), show link
+  img.onerror = () => {
+    img.style.display = 'none';
+    showDirectLink(imgUrl);
+  };
+
+  wrap.appendChild(img);
+  document.getElementById('btn-dl-gen').style.display = 'flex';
+  showToast('✓ Image generated successfully!');
+}
+
+function showDirectLink(url) {
+  stopStatusCycle();
+  document.getElementById('gen-loading').innerHTML = `
+    <div style="text-align:center;padding:2rem">
+      <div style="font-size:3rem;margin-bottom:1rem">🖼️</div>
+      <p style="font-weight:700;margin-bottom:0.5rem;color:var(--dark)">Image Ready!</p>
+      <p style="color:var(--gray);font-size:0.85rem;margin-bottom:1rem">Click below to view your generated image</p>
+      <a href="${url}" target="_blank" style="display:inline-block;padding:10px 24px;background:var(--purple);color:white;border-radius:10px;text-decoration:none;font-weight:600">🔗 Open Image →</a>
+    </div>`;
+}
+
+function showError(msg) {
+  stopStatusCycle();
+  document.getElementById('gen-loading').innerHTML = `
+    <div style="text-align:center;padding:2rem">
+      <div style="font-size:2.5rem;margin-bottom:0.75rem">⚠️</div>
+      <p style="color:#EF4444;font-weight:700;margin-bottom:0.5rem">Generation failed</p>
+      <p style="color:var(--gray);font-size:0.85rem;max-width:340px;line-height:1.5">${msg}</p>
+      <button onclick="generateImage()" style="margin-top:1rem;padding:10px 24px;background:var(--purple);color:white;border:none;border-radius:10px;cursor:pointer;font-weight:600;font-family:inherit">🔄 Try Again</button>
+    </div>`;
+}
+
+// ─── Load image via plain <img> tag (no CORS, no fetch) ───────────────────────
+function loadImageTag(url, timeoutMs = 60000) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const t = setTimeout(() => { img.src = ''; reject(new Error('timeout')); }, timeoutMs);
+    img.onload  = () => { clearTimeout(t); img.naturalWidth > 0 ? resolve(url) : reject(new Error('empty')); };
+    img.onerror = () => { clearTimeout(t); reject(new Error('error')); };
+    img.src = url;
+  });
+}
+
+// ─── Build Pollinations URL variants ──────────────────────────────────────────
+function pollinationsUrl(prompt, model, w, h) {
+  const seed = Math.floor(Math.random() * 999999);
+  // Correct Pollinations image endpoint
+  return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?model=${model}&width=${w}&height=${h}&seed=${seed}&nologo=true`;
+}
+
+// ─── MAIN GENERATE ────────────────────────────────────────────────────────────
+async function generateImage() {
+  const rawPrompt = document.getElementById('gen-prompt').value.trim();
+  if (!rawPrompt) { showToast('Please enter a description!', 'error'); return; }
+
+  const btn = document.getElementById('btn-generate');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px;margin:0;flex-shrink:0;border-top-color:white"></div>&nbsp;Generating...';
+
+  resetLoading();
+  startStatusCycle([
+    '✨ Firing up the AI...',
+    '🎨 Painting your scene...',
+    '⚡ Processing pixels...',
+    '🌟 Adding fine details...',
+    '🖼️ Almost ready...',
+  ]);
+
+  const { w, h } = getRatioDimensions();
+
+  // Quality suffix based on model selection
+  const qualityMap = {
+    'flux':     ', ultra detailed, sharp, vibrant, 8k quality',
+    'flux-dev': ', highly detailed, artistic, cinematic lighting, 8k',
+    'dalle3':   ', photorealistic, professional photography, award winning',
+    'sdxl':     ', hyperdetailed, HDR, studio quality, masterpiece',
+  };
+  const qualitySuffix = qualityMap[selectedModel] || ', high quality, 4k';
+  const fullPrompt = rawPrompt + qualitySuffix;
+
+  // ── Engine priority list: Pollinations with multiple models ──────────────
+  // Each entry: [model, description]
+  const engines = [
+    ['flux',          '⚡ FLUX model'],
+    ['flux-realism',  '🎨 FLUX Realism'],
+    ['turbo',         '🚀 Turbo model'],
+    ['flux-anime',    '✨ FLUX Anime'],
+    ['flux-3d',       '🌐 FLUX 3D'],
+  ];
+
+  let generated = false;
+
+  for (let i = 0; i < engines.length; i++) {
+    const [model, label] = engines[i];
+    setStatus(`${label}: rendering... (${i + 1}/${engines.length})`);
+    const url = pollinationsUrl(fullPrompt, model, w, h);
+
+    try {
+      await loadImageTag(url, 55000);
+      showSuccess(url);
+      generated = true;
+      break;
+    } catch (e) {
+      console.warn(`Engine ${label} failed:`, e.message);
+      setStatus(`${label} failed, trying next...`);
+      await new Promise(r => setTimeout(r, 800));
+    }
+  }
+
+  // ── Puter.js as last resort (requires sign-in on first use) ──────────────
+  if (!generated) {
+    setStatus('🤖 Trying Puter AI (may require sign-in)...');
+    try {
+      const modelMap = {
+        'flux':     'black-forest-labs/FLUX.1-schnell',
+        'flux-dev': 'black-forest-labs/FLUX.1-dev',
+        'dalle3':   'dall-e-3',
+        'sdxl':     'stabilityai/stable-diffusion-xl-base-1.0',
+      };
+      const puterModel = modelMap[selectedModel] || 'black-forest-labs/FLUX.1-schnell';
+      const imgEl = await puter.ai.txt2img(fullPrompt, { model: puterModel });
+      // Puter returns an <img> element
+      imgEl.id = 'gen-result-img';
+      imgEl.style.cssText = 'width:100%;border-radius:16px;display:block;';
+      document.getElementById('gen-loading').style.display = 'none';
+      document.getElementById('gen-img-wrap').appendChild(imgEl);
+      document.getElementById('btn-dl-gen').style.display = 'flex';
+      stopStatusCycle();
+      lastGenUrl = imgEl.src;
+      showToast('✓ Image generated!');
+      generated = true;
+    } catch(e) {
+      console.warn('Puter failed:', e);
+    }
+  }
+
+  if (!generated) {
+    showError(
+      'Could not generate image. This usually happens because:<br><br>' +
+      '• Ad blockers blocking the image API<br>' +
+      '• Slow internet / timeout<br>' +
+      '• API temporarily overloaded<br><br>' +
+      'Try disabling your ad blocker, or try a different model.'
+    );
+    showToast('Generation failed — try again!', 'error');
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '✨ Generate Image';
+}
+
+function downloadGenImage() {
+  if (!lastGenUrl) return;
+  // Open in new tab — user can right-click save (avoids all CORS issues)
+  const a = document.createElement('a');
+  a.href = lastGenUrl;
+  a.target = '_blank';
+  a.rel = 'noopener';
+  a.download = 'convertai-image.jpg';
+  a.click();
+  showToast('Opening image — right-click to save if download doesn\'t start!');
+}
+
+// ===================== IMAGE TO PDF =====================
+let pdfImages = [];
+
+document.getElementById('pdf-input').addEventListener('change', (e) => {
+  addPdfImages(Array.from(e.target.files));
+});
+
+const pdfDrop = document.getElementById('pdf-drop');
+pdfDrop.addEventListener('dragover', e => { e.preventDefault(); pdfDrop.classList.add('dragover'); });
+pdfDrop.addEventListener('dragleave', () => pdfDrop.classList.remove('dragover'));
+pdfDrop.addEventListener('drop', e => {
+  e.preventDefault(); pdfDrop.classList.remove('dragover');
+  addPdfImages(Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')));
+});
+
+function addPdfImages(files) {
+  files.forEach(f => pdfImages.push(f));
+  renderPdfImages();
+  document.getElementById('btn-pdf').disabled = pdfImages.length === 0;
+}
+
+function renderPdfImages() {
+  const grid = document.getElementById('pdf-images-grid');
+  grid.innerHTML = '';
+  pdfImages.forEach((f, i) => {
+    const url = URL.createObjectURL(f);
+    const div = document.createElement('div');
+    div.className = 'pdf-img-item';
+    div.innerHTML = `
+      <img src="${url}" alt="">
+      <span class="pdf-img-num">#${i+1}</span>
+      <button class="pdf-img-remove" onclick="removePdfImage(${i})">×</button>
+    `;
+    grid.appendChild(div);
+  });
+}
+
+function removePdfImage(idx) {
+  pdfImages.splice(idx, 1);
+  renderPdfImages();
+  document.getElementById('btn-pdf').disabled = pdfImages.length === 0;
+}
+
+async function generatePDF() {
+  if (!pdfImages.length) return;
+  const btn = document.getElementById('btn-pdf');
+  btn.disabled = true; btn.textContent = '⏳ Generating PDF...';
+
+  try {
+    const { jsPDF } = window.jspdf;
+
+    let pdf = null;
+
+    for (let i = 0; i < pdfImages.length; i++) {
+      const dataUrl = await fileToDataUrl(pdfImages[i]);
+      const imgProps = await getImageDimensions(dataUrl);
+
+      // A4 page dimensions in mm
+      const pageW = 210, pageH = 297;
+      const ratio = Math.min(pageW / imgProps.w, pageH / imgProps.h);
+      const imgW = imgProps.w * ratio;
+      const imgH = imgProps.h * ratio;
+      const x = (pageW - imgW) / 2;
+      const y = (pageH - imgH) / 2;
+
+      if (!pdf) {
+        pdf = new jsPDF({ orientation: imgW > imgH ? 'landscape' : 'portrait', unit: 'mm', format: 'a4' });
+      } else {
+        pdf.addPage(imgW > imgH ? 'landscape' : 'portrait');
+      }
+
+      const fmt = pdfImages[i].type.includes('png') ? 'PNG' : 'JPEG';
+      pdf.addImage(dataUrl, fmt, x, y, imgW, imgH);
+    }
+
+    pdf.save('convertai-images.pdf');
+    showToast(`✓ PDF created with ${pdfImages.length} image(s)!`);
+  } catch(e) {
+    showToast('PDF generation failed. Try again.', 'error');
+  }
+
+  btn.disabled = false; btn.innerHTML = '📑 Generate PDF';
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = e => resolve(e.target.result);
+    r.onerror = reject;
+    r.readAsDataURL(file);
+  });
+}
+
+function getImageDimensions(dataUrl) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve({ w: img.width, h: img.height });
+    img.src = dataUrl;
+  });
+}
+</script>
+</body>
+</html>
