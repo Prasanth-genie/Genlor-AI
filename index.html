@@ -661,6 +661,25 @@ nav {
 @media(max-width:900px){.tools-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:600px){.tools-grid{grid-template-columns:1fr}}
 
+
+/* === AD SLOTS === */
+.ad-slot{
+  width:100%;background:rgba(19,15,34,.7);border:1px dashed rgba(139,114,255,.25);
+  border-radius:var(--r-l);overflow:hidden;display:flex;align-items:center;
+  justify-content:center;position:relative;
+}
+.ad-slot::before{
+  content:'Advertisement';position:absolute;top:8px;left:12px;
+  font-size:.62rem;letter-spacing:.08em;font-weight:600;
+  color:rgba(139,114,255,.4);text-transform:uppercase;
+}
+.ad-leaderboard{height:90px;max-width:728px;margin:0 auto;}
+.ad-banner-wrap{padding:clamp(.75rem,2vw,1.25rem) clamp(1.25rem,5vw,2rem);background:var(--surface2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.ad-inline-wrap{padding:clamp(1rem,3vw,1.5rem) 0;}
+.ad-rectangle{height:250px;max-width:336px;margin:0 auto;}
+.ad-inline-banner{height:90px;width:100%;}
+@media(max-width:600px){.ad-leaderboard{height:50px;}.ad-rectangle{height:200px;max-width:300px;}}
+
 </style>
 </head>
 <body>
@@ -683,6 +702,17 @@ nav {
   <button class="nav-pill" onclick="showPage('converter');closeMenu()"><span class="pill-ico">📄</span>Image Converter</button>
   <button class="nav-pill" onclick="showPage('generator');closeMenu()"><span class="pill-ico">✨</span>AI Image Generator</button>
   <button class="nav-pill" onclick="showPage('pdf');closeMenu()"><span class="pill-ico">📑</span>Image to PDF</button>
+</div>
+
+
+<!-- ═══ AD: TOP LEADERBOARD ═══ -->
+<div class="ad-banner-wrap">
+  <div class="ad-slot ad-leaderboard">
+    <!-- Google AdSense: Replace with your ad code -->
+    <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-XXXXXXXX" data-ad-slot="XXXXXXXX"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script> -->
+  </div>
 </div>
 
 <!-- ═══ HOME ═══ -->
@@ -776,6 +806,19 @@ nav {
     </div>
   </div>
 
+
+  <!-- ═══ AD: MID-PAGE BANNER ═══ -->
+  <div class="ad-banner-wrap">
+    <div class="section" style="padding-top:0;padding-bottom:0;">
+      <div class="ad-inline-wrap">
+        <div class="ad-slot ad-inline-banner">
+          <!-- Google AdSense: Replace with your ad code -->
+          <!-- <ins class="adsbygoogle" style="display:block" data-ad-format="auto" data-full-width-responsive="true" data-ad-client="ca-pub-XXXXXXXX" data-ad-slot="XXXXXXXX"></ins> -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Features -->
   <div class="feat-section">
     <div class="section">
@@ -788,6 +831,15 @@ nav {
         <div class="feat-item rv rv1"><div class="feat-ico fi-g">🛡️</div><h3>Completely Free</h3><p>No hidden costs, no file limits, no account required. Free forever — use as much as you need.</p></div>
         <div class="feat-item rv rv2"><div class="feat-ico fi-b">🌐</div><h3>Works Everywhere</h3><p>Desktop, tablet, or phone — pixel-perfect experience on every screen size and device.</p></div>
       </div>
+    </div>
+  </div>
+
+
+  <!-- ═══ AD: FOOTER LEADERBOARD ═══ -->
+  <div class="ad-banner-wrap" style="border-bottom:none;">
+    <div class="ad-slot ad-leaderboard">
+      <!-- Google AdSense: Replace with your ad code -->
+      <!-- <ins class="adsbygoogle" style="display:inline-block;width:728px;height:90px" data-ad-client="ca-pub-XXXXXXXX" data-ad-slot="XXXXXXXX"></ins> -->
     </div>
   </div>
 
@@ -902,7 +954,6 @@ nav {
           <p>From idea to image in four effortless steps</p>
         </div>
         <div class="ai-stepper">
-          <div class="ai-line"></div>
           <div class="ai-step"><div class="ai-icon-wrap"><div class="ai-icon">✏️</div><div class="ai-badge">01</div></div><div><h4>Describe Your Idea</h4><p>Write a vivid prompt — the more detail, the better.</p></div></div>
           <div class="ai-step"><div class="ai-icon-wrap"><div class="ai-icon">🤖</div><div class="ai-badge">02</div></div><div><h4>Choose a Model</h4><p>FLUX, DALL·E 3, or Stable Diffusion — your pick.</p></div></div>
           <div class="ai-step"><div class="ai-icon-wrap"><div class="ai-icon">⚡</div><div class="ai-badge">03</div></div><div><h4>AI Renders It</h4><p>Powered by Puter.js — secure, free, seconds.</p></div></div>
@@ -995,7 +1046,7 @@ setTimeout(reveal,120);
 /* ─── STATS COUNTER ───────────────────────── */
 (()=>{
   const fe=document.getElementById('sn-files');
-  const TARGET=281;
+  const TARGET=2877160961;
   const start=Math.floor(TARGET*.97);
   let s=0;const n=50;
   const id=setInterval(()=>{
